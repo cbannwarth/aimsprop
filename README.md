@@ -36,3 +36,5 @@ directories and modify until they work)
 - Monika Williams
 - Hayley Weir
 - Colton Hicks
+- Alessio Valentini
+- Alice R. Walker
