@@ -1,18 +1,18 @@
-#!/usr/bin/env python
 import glob
 import re
 
 import matplotlib
 import numpy as np
 
-matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+matplotlib.use("Agg")
 
 
 # Python script to automatically extract TeraChem output (TD-DFT or CASCI) and plot
 # Lorentzian or Gaussian broadened absorption spectrum.
 
 # Can plot spectra in eV or nm, depending on how you modify the exection.
+
 
 def read_tddft_outfile(filename):
 
@@ -68,26 +68,18 @@ def read_fomo_outfile(filename):
 
 
 def lorentzian(
-    x,
-    x0,
-    delta,
+    x, x0, delta,
 ):
 
     return 0.5 * delta / np.pi * 1.0 / ((x - x0) ** 2 + (0.5 * delta) ** 2)
 
-def gaussian(
-    x,
-    x0,
-    delta
-):
-    return np.exp(-np.power(x - x0, 2.) / (2 * np.power(delta, 2.)))
+
+def gaussian(x, x0, delta):
+    return np.exp(-np.power(x - x0, 2.0) / (2 * np.power(delta, 2.0)))
 
 
 def plot_spectra(
-    filename,
-    spectra,
-    E=np.linspace(3.5, 7.0, 1000),
-    delta=0.05,
+    filename, spectra, E=np.linspace(3.5, 7.0, 1000), delta=0.05,
 ):
 
     Nspectra = len(spectra)
@@ -117,11 +109,9 @@ def plot_spectra(
     plt.ylabel("Cross Section [-]")
     plt.savefig(filename)
 
+
 def plot_spectra_nm(
-    filename,
-    spectra,
-    E=np.linspace(3.5, 7.0, 1000),
-    delta=0.05,
+    filename, spectra, E=np.linspace(3.5, 7.0, 1000), delta=0.05,
 ):
     Nspectra = len(spectra)
     Nstate = spectra[0].shape[0]
