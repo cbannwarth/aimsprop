@@ -9,6 +9,11 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 
+# Python script to automatically extract TeraChem output (TD-DFT or CASCI) and plot
+# Lorentzian or Gaussian broadened absorption spectrum.
+
+# Can plot spectra in eV or nm, depending on how you modify the exection.
+
 def read_tddft_outfile(filename):
 
     lines = open(filename).readlines()
@@ -70,6 +75,13 @@ def lorentzian(
 
     return 0.5 * delta / np.pi * 1.0 / ((x - x0) ** 2 + (0.5 * delta) ** 2)
 
+def gaussian(
+    x,
+    x0,
+    delta
+):
+    return np.exp(-np.power(x - x0, 2.) / (2 * np.power(delta, 2.)))
+
 
 def plot_spectra(
     filename,
@@ -105,6 +117,43 @@ def plot_spectra(
     plt.ylabel("Cross Section [-]")
     plt.savefig(filename)
 
+def plot_spectra_nm(
+    filename,
+    spectra,
+    E=np.linspace(3.5, 7.0, 1000),
+    delta=0.05,
+):
+    Nspectra = len(spectra)
+    Nstate = spectra[0].shape[0]
+
+    Ostates = []
+    for state in range(Nstate):
+        Ostate = np.zeros_like(E)
+        for spectrum in spectra:
+            Ostate += spectrum[state, 1] * lorentzian(E, spectrum[state, 0], delta)
+        Ostate /= Nspectra
+        Ostates.append(Ostate)
+
+    Ototal = np.zeros_like(E)
+    for Ostate in Ostates:
+        Ototal += Ostate
+
+    cmap = matplotlib.cm.get_cmap("jet")
+    colors = [cmap(float(x) / (Nstate - 1)) for x in reversed(list(range(Nstate)))]
+
+    nm = (1239.84193) / E
+
+    plt.clf()
+    for Oind, Ostate in enumerate(Ostates):
+        plt.plot(nm, Ostate, color=colors[Oind])
+
+    plt.plot(nm, Ototal, "-k")
+    plt.xlabel(r"$\lambda$ [nm]")
+    plt.ylabel("Cross Section [-]")
+    plt.savefig(filename)
+
+
+# --- Execution section --- #
 
 filenames = glob.glob("0*/output.dat")
 spectra = [read_fomo_outfile(x) for x in filenames]
