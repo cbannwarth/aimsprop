@@ -1,3 +1,35 @@
+"""
+Written by Rob Parrish
+
+This script reads TeraChem TDDFT and/or FOMO output files and automatically plots absorption spectra.
+
+Each individual excited state is given a color, with the overall spectrum plotted in black on top.
+
+The script includes options to plot with Lorentzian or Gaussian broadening. To change it, modify the ```plot_spectra``` function to change:
+
+```python
+Ostate += spectrum[state, 1] * lorentzian(E, spectrum[state, 0], delta)
+```
+
+to 
+
+```python
+Ostate += spectrum[state, 1] * gaussian(E, spectrum[state, 0], delta)
+```
+
+It also includes options to plot in eV or nm, with `plot_spectra` or `plot_spectra_nm` respectively.
+
+Modify the following code block with appropriate paths for your system, choice of fomo or tddft for `read_*_output`, and choice of eV of nm for `plot_*`.  
+
+```
+filenames = glob.glob("/path/to/*/filename*.out")
+spectra = [read_fomo_outfile(x) for x in filenames]
+spectra = [x for x in spectra if x is not None]
+plot_spectra("spectra.pdf", spectra, E=np.linspace(5.0, 9.0, 1000), delta=0.10)
+```
+
+
+"""
 import glob
 import re
 
@@ -68,7 +100,9 @@ def read_fomo_outfile(filename):
 
 
 def lorentzian(
-    x, x0, delta,
+    x,
+    x0,
+    delta,
 ):
 
     return 0.5 * delta / np.pi * 1.0 / ((x - x0) ** 2 + (0.5 * delta) ** 2)
@@ -79,7 +113,10 @@ def gaussian(x, x0, delta):
 
 
 def plot_spectra(
-    filename, spectra, E=np.linspace(3.5, 7.0, 1000), delta=0.05,
+    filename,
+    spectra,
+    E=np.linspace(3.5, 7.0, 1000),
+    delta=0.05,
 ):
 
     Nspectra = len(spectra)
@@ -111,7 +148,10 @@ def plot_spectra(
 
 
 def plot_spectra_nm(
-    filename, spectra, E=np.linspace(3.5, 7.0, 1000), delta=0.05,
+    filename,
+    spectra,
+    E=np.linspace(3.5, 7.0, 1000),
+    delta=0.05,
 ):
     Nspectra = len(spectra)
     Nstate = spectra[0].shape[0]
@@ -145,7 +185,8 @@ def plot_spectra_nm(
 
 # --- Execution section --- #
 
-filenames = glob.glob("0*/output.dat")
-spectra = [read_fomo_outfile(x) for x in filenames]
-spectra = [x for x in spectra if x is not None]
-plot_spectra("spectra.pdf", spectra, E=np.linspace(5.0, 9.0, 1000), delta=0.10)
+if __name__ == "__main__":
+    filenames = glob.glob("0*/output.dat")
+    spectra = [read_fomo_outfile(x) for x in filenames]
+    spectra = [x for x in spectra if x is not None]
+    plot_spectra("spectra.pdf", spectra, E=np.linspace(5.0, 9.0, 1000), delta=0.10)

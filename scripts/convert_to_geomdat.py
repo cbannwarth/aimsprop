@@ -1,3 +1,11 @@
+"""
+Written by Ruibin Liang
+
+This script converts from Amber restart format to AIMS Geometry.dat files. It assumes your restart file has velocities.
+
+To use, simply change the instances of "coors.rst" and relevant automatic renaming to suit your needs. For AIMS trajectories, your final file _must_ be named Geometry.dat in the submit folder.
+"""
+
 import numpy as np
 
 # This script automatically converts a restart file to a Geometry.dat with AIMS runs.
