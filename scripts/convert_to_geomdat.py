@@ -12,11 +12,11 @@ main('test_data/parm.prmtop','test_data/','test_data/outs/')
 # This script automatically converts a restart file to a Geometry.dat with AIMS runs.
 # It assumes that you have velocities in the restart file.
 
+import argparse
 from pathlib import Path
 
 import numpy as np
 
-import argparse
 
 def read_prmtop(prmpath):
     namelist = []
@@ -135,12 +135,17 @@ def convert_geometries(
         coords, vel, numats = read_rst(filename)
         output_geom(names, masses, coords, vel, numats, Outpath, filename)
 
-    
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p","--prm", dest="prmpath",help="/path/to/input/prmtop",required=True)
-    parser.add_argument("-r","--rst", dest="rstpath",help="/path/to/input/restarts",required=True)
-    parser.add_argument("-o","--out", dest="outpath",help="/path/to/outputs/",required=True)
+    parser.add_argument(
+        "-p", "--prm", dest="prmpath", help="/path/to/input/prmtop", required=True
+    )
+    parser.add_argument(
+        "-r", "--rst", dest="rstpath", help="/path/to/input/restarts", required=True
+    )
+    parser.add_argument(
+        "-o", "--out", dest="outpath", help="/path/to/outputs/", required=True
+    )
     args = parser.parse_args()
-    convert_geometries(args.prmpath,args.rstpath,args.outpath)
+    convert_geometries(args.prmpath, args.rstpath, args.outpath)
