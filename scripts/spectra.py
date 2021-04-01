@@ -11,7 +11,7 @@ The script includes options to plot with Lorentzian or Gaussian broadening. To c
 Ostate += spectrum[state, 1] * lorentzian(E, spectrum[state, 0], delta)
 ```
 
-to 
+to
 
 ```python
 Ostate += spectrum[state, 1] * gaussian(E, spectrum[state, 0], delta)
@@ -19,7 +19,7 @@ Ostate += spectrum[state, 1] * gaussian(E, spectrum[state, 0], delta)
 
 It also includes options to plot in eV or nm, with `plot_spectra` or `plot_spectra_nm` respectively.
 
-Modify the following code block with appropriate paths for your system, choice of fomo or tddft for `read_*_output`, and choice of eV of nm for `plot_*`.  
+Modify the following code block with appropriate paths for your system, choice of fomo or tddft for `read_*_output`, and choice of eV of nm for `plot_*`.
 
 ```
 filenames = glob.glob("/path/to/*/filename*.out")
@@ -100,9 +100,7 @@ def read_fomo_outfile(filename):
 
 
 def lorentzian(
-    x,
-    x0,
-    delta,
+    x, x0, delta,
 ):
 
     return 0.5 * delta / np.pi * 1.0 / ((x - x0) ** 2 + (0.5 * delta) ** 2)
@@ -113,10 +111,7 @@ def gaussian(x, x0, delta):
 
 
 def plot_spectra(
-    filename,
-    spectra,
-    E=np.linspace(3.5, 7.0, 1000),
-    delta=0.05,
+    filename, spectra, E=np.linspace(3.5, 7.0, 1000), delta=0.05,
 ):
 
     Nspectra = len(spectra)
@@ -148,10 +143,7 @@ def plot_spectra(
 
 
 def plot_spectra_nm(
-    filename,
-    spectra,
-    E=np.linspace(3.5, 7.0, 1000),
-    delta=0.05,
+    filename, spectra, E=np.linspace(3.5, 7.0, 1000), delta=0.05,
 ):
     Nspectra = len(spectra)
     Nstate = spectra[0].shape[0]
