@@ -9,21 +9,18 @@ main('test_data/parm.prmtop','test_data/','test_data/outs/')
 
 """
 
-
 # This script automatically converts a restart file to a Geometry.dat with AIMS runs.
 # It assumes that you have velocities in the restart file.
 
-#path_obj = Path(path_to_prmtop) 
-
-import numpy as np
-from pathlib import Path
 import glob
-import os 
+import os
+from pathlib import Path
+import numpy as np
 
-def read_prmtop(parmpath):
+def read_prmtop(prmpath):
     namelist = []
     atommass = []
-    with open(parmpath) as f:
+    with open(prmpath) as f:
         for line in f:
             if "ATOM_NAME" in line:
                 line = next(f)
@@ -42,7 +39,7 @@ def read_prmtop(parmpath):
                     else:
                         a = line.split()
                         for x in a:
-                          atommass.append(float(x))
+                            atommass.append(float(x))
     return namelist, atommass
 
 
@@ -72,23 +69,17 @@ def read_rst(rstpath):
 
 
 def output_geom(
-    namelist,
-    atommass,
-    atomcoord,
-    atomvel,
-    atomnum,
-    outpath,
-    filename,
-): 
-    #Initialize new output directory if it doesn't exist
+    namelist, atommass, atomcoord, atomvel, atomnum, outpath, filename,
+):
+    # Initialize new output directory if it doesn't exist
     os.system("mkdir -p " + outpath)
-    #Create directory structure from original files
-    newdir = filename.split('/')[:-1]
+    # Create directory structure from original files
+    newdir = filename.split("/")[:-1]
     if len(newdir) > 1:
         newdir = "-".join(newdir)
 
-    os.system("mkdir -p " + outpath + newdir) 
-    with open(outpath + newdir + '/Geometry.dat','w+') as f:
+    os.system("mkdir -p " + outpath + newdir)
+    with open(outpath + newdir + "/Geometry.dat", "w+") as f:
         f.write("UNITS=BOHR\n")
         f.write(str(atomnum) + "\n")
         for j in range(0, atomnum):
@@ -117,19 +108,26 @@ def output_geom(
                 )  # time unit in rst7: 1/20.455 ps   length unit in rst7: angstrom    mass unit in amber: atomic mass unit
             f.write("\n")
 
-def main(
-    prmpath,
-    rstpath,
-    outpath,
-):
-    #Get initial information from parmtop
-    names, masses = read_prmtop(prmpath)
-    
-    #Find all restart files in test data
-    filenames = glob.glob(rstpath+"*/*.rst*")
-    print(filenames) 
-    #Create new dats 
-    for filename in filenames:
-      coords, vel, numats = read_rst(filename)
-      output_geom(names, masses, coords, vel, numats, outpath, filename)
 
+def main(
+    prmpath: str, 
+    rstpath: str, 
+    outpath: str,
+):
+
+    Prmpath = Path(prmpath)
+    Rstpath = Path(rstpath)
+#    Outpath = Path(outpath)
+
+    # Get initial information from parmtop
+    names, masses = read_prmtop(Prmpath)
+
+    # Find all restart files in test data
+    filenames = Rstpath.glob('*/*.rst*')
+    print(filenames)
+    # Create new dats
+    for filename in filenames:
+        coords, vel, numats = read_rst(filename)
+        output_geom(names, masses, coords, vel, numats, outpath, filename)
+
+main('test_data/parm.prmtop','test_data/','test_data/outs/')
