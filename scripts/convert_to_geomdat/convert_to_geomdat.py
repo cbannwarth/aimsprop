@@ -12,10 +12,10 @@ main('test_data/parm.prmtop','test_data/','test_data/outs/')
 # This script automatically converts a restart file to a Geometry.dat with AIMS runs.
 # It assumes that you have velocities in the restart file.
 
-import glob
-import os
 from pathlib import Path
+
 import numpy as np
+
 
 def read_prmtop(prmpath):
     namelist = []
@@ -47,7 +47,7 @@ def read_rst(rstpath):
     atomcoord = np.array([])
     atomvel = np.array([])
     atomnum = 0
-    with open(rstpath) as f:
+    with rstpath.open() as f:
         f.readline()
         line = f.readline()
         atomnum = int(line.split()[0])
@@ -71,15 +71,19 @@ def read_rst(rstpath):
 def output_geom(
     namelist, atommass, atomcoord, atomvel, atomnum, outpath, filename,
 ):
-    # Initialize new output directory if it doesn't exist
-    os.system("mkdir -p " + outpath)
-    # Create directory structure from original files
-    newdir = filename.split("/")[:-1]
-    if len(newdir) > 1:
-        newdir = "-".join(newdir)
 
-    os.system("mkdir -p " + outpath + newdir)
-    with open(outpath + newdir + "/Geometry.dat", "w+") as f:
+    # Initialize new output directory if it doesn't exist
+
+    if not outpath.exists():
+        Path.mkdir(outpath)
+
+    # Create directory structure from original files
+
+    newdir = filename.parent
+    finalpath = outpath.joinpath(newdir.relative_to(newdir.parent))
+    Path.mkdir(finalpath, parents=True, exist_ok=True)
+
+    with open(finalpath.joinpath("Geometry.dat"), "w+") as f:
         f.write("UNITS=BOHR\n")
         f.write(str(atomnum) + "\n")
         for j in range(0, atomnum):
@@ -110,24 +114,25 @@ def output_geom(
 
 
 def main(
-    prmpath: str, 
-    rstpath: str, 
-    outpath: str,
+    prmpath: str, rstpath: str, outpath: str,
 ):
+
+    findme = "*/*.rst*"
 
     Prmpath = Path(prmpath)
     Rstpath = Path(rstpath)
-#    Outpath = Path(outpath)
+    Outpath = Path(outpath)
 
     # Get initial information from parmtop
     names, masses = read_prmtop(Prmpath)
 
     # Find all restart files in test data
-    filenames = Rstpath.glob('*/*.rst*')
-    print(filenames)
+    filenames = list(Rstpath.glob(findme))
+
     # Create new dats
     for filename in filenames:
         coords, vel, numats = read_rst(filename)
-        output_geom(names, masses, coords, vel, numats, outpath, filename)
+        output_geom(names, masses, coords, vel, numats, Outpath, filename)
 
-main('test_data/parm.prmtop','test_data/','test_data/outs/')
+
+main("test_data/parm.prmtop", "test_data/", "test_data/outs/")
